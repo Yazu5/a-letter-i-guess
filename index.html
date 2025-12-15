@@ -10,46 +10,62 @@
   body {
     margin: 0;
     padding: 0;
-    background: #f0e6d2; /* page background */
-    font-family: 'Patrick Hand', cursive; /* handwritten font */
+    background: #e8e0d4; /* light background */
+    font-family: 'Patrick Hand', cursive;
     overflow: hidden;
-    -webkit-user-select: none; /* disable text selection */
+    -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
   }
 
-  /* CSS parchment */
+  /* Realistic parchment */
   .letter-container {
     position: relative;
     width: 70%;
     max-width: 800px;
     margin: auto;
-    top: 10%;
+    top: 5%;
     padding: 40px;
     font-size: 1.4em;
     line-height: 1.8em;
-    height: 80%;
+    height: 90%;
     overflow: hidden;
-    border-radius: 20px;
-    box-shadow: 0 0 40px rgba(0,0,0,0.6);
-    background-color: #fdf1d6;
-    background-image: 
-      radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
-      linear-gradient(to bottom right, rgba(255,255,255,0.2), rgba(0,0,0,0.05));
-    background-size: 20px 20px, 100% 100%;
-    border: 3px solid;
-    border-image: linear-gradient(to bottom, #d2b48c, #c19a6b) 1;
+    border-radius: 15px;
+    background: linear-gradient(120deg, #fef3d4, #f4e1b6 50%, #fce8b0);
+    background-size: 100% 100%;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.2),
+                0 0 50px rgba(0,0,0,0.3);
+    border: 2px solid #d2b48c;
+    position: relative;
+  }
+
+  /* optional "burned edges" effect using pseudo-elements */
+  .letter-container::before,
+  .letter-container::after {
+    content: '';
+    position: absolute;
+    left: -5px;
+    right: -5px;
+    height: 10px;
+    background: radial-gradient(circle, rgba(0,0,0,0.05), transparent);
+  }
+
+  .letter-container::before {
+    top: -5px;
+  }
+  .letter-container::after {
+    bottom: -5px;
   }
 
   .letter-content {
     position: relative;
     top: 100%;
-    white-space: pre-wrap; /* preserves paragraphs and spaces */
+    white-space: pre-wrap;
   }
 
   audio {
-    display: none; /* hide audio completely */
+    display: none;
   }
 </style>
 </head>
@@ -72,19 +88,11 @@
   let scrollPos = 0;
   let scrolling = false;
 
-  function startScroll() {
-    if(!scrolling){
-      scrolling = true;
-      scrollLetter();
-    }
-  }
-
   function scrollLetter(){
     if(scrolling){
-      scrollPos -= 0.1; // very slow
+      scrollPos -= 0.1; // slow scroll
       content.style.top = scrollPos + 'px';
-      // Stop scrolling when bottom of letter reaches container bottom
-      if (Math.abs(scrollPos) < content.scrollHeight - container.clientHeight + 10) {
+      if(Math.abs(scrollPos) < content.scrollHeight - container.clientHeight + 10){
         requestAnimationFrame(scrollLetter);
       } else {
         scrolling = false; // stop at end
@@ -92,29 +100,26 @@
     }
   }
 
-  function toggleScroll(){
-    scrolling = !scrolling;
-    if(scrolling){
+  function startScroll(){
+    if(!scrolling){
+      scrolling = true;
       scrollLetter();
     }
   }
 
-  function startExperience() {
+  function startExperience(){
     if(music.paused){
       music.play();
       startScroll();
-    } else {
-      toggleScroll();
     }
   }
 
-  // Start music and scroll on first touch or click
   document.body.addEventListener('touchstart', startExperience, {once:true});
   document.body.addEventListener('click', startExperience, {once:true});
 
-  // Load letter from file
+  // Load letter
   fetch('letter.txt')
-    .then(response => response.text())
+    .then(res => res.text())
     .then(text => {
       content.textContent = text;
     })
